@@ -3,7 +3,7 @@ const app = express();
 const port = 5000;
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const session = require('cookie-session');
 const passport = require('passport');
 const cors = require('cors');
 const {errorHandler} = require('./middleware/error');
@@ -47,6 +47,7 @@ app.use(session({
     saveUninitialized : false,
     resave : false,
     cookie : {
+        secure : true,
         maxAge : (1000 * 60 * 100)
     },
 }));
