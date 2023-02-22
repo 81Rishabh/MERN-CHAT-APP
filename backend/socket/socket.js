@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 module.exports.chat_sockets = function (chatServer) {
   const io = new Server(chatServer, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "https://chitchat-frontend-l8g9.onrender.com",
     },
   });
 
