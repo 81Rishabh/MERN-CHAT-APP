@@ -44,13 +44,26 @@ app.use('/uploads' , express.static(__dirname + '/uploads'));
 app.use(session({
     name : 'chitchat',
     secret : 'hbahsir',
-    saveUninitialized : false,
+    saveUninitialized : true,
     resave : false,
     cookie : {
-        secure : true,
         maxAge : (1000 * 60 * 100)
     },
 }));
+
+app.use(function(request, response, next) {
+    if (request.session && !request.session.regenerate) {
+        request.session.regenerate = (cb) => {
+            cb()
+        }
+    }
+    if (request.session && !request.session.save) {
+        request.session.save = (cb) => {
+            cb()
+        }
+    }
+    next()
+})
 
 // passport midilware
 app.use(passport.initialize());
