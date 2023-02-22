@@ -62,7 +62,7 @@ app.use(function(request, response, next) {
             cb()
         }
     }
-    next()
+    next();
 })
 
 // passport midilware
