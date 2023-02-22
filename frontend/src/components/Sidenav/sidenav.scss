@@ -1,0 +1,155 @@
+:root {
+  --font-light-600: #fff;
+  --font-light-500: #585656;
+  --font-light-400: #787878;
+}
+
+div.sidenav {
+  background: #1d1d1d;
+  height: 100%;
+  width: 25rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: all.3s ease-out;
+  z-index: 2;
+
+  header.sidenav__header {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .navbar-logo {
+      width: 70px;
+      cursor: pointer;
+    }
+
+    .sidenav__header__items {
+      width: 225px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      outline-offset: 1px;
+
+      .create__group {
+        background-color: #2d2c2c;
+        padding: 10px 5px;
+        outline: 2px solid #2f2f2f;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+
+        &:hover {
+          background-color: #333232;
+        }
+      }
+
+      svg {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .sidenav__body {
+    overflow-y: auto;
+  }
+
+  // accordion styling
+  .accordion {
+    // background: #2d2c2c;
+    cursor: pointer;
+    margin-bottom: 10px;
+
+    .accordion__header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      justify-content: space-between;
+    }
+
+    .accordion__body {
+      background: #1d1d1d;
+      overflow-y: auto;
+
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .sidenav__groups__items {
+        .typing-text {
+          font-size: 0.75rem;
+          margin: 0.75rem 0 0 2.2rem;
+          color: #d0d0d0;
+          animation: fadeInOut 1s linear infinite alternate;
+
+          @keyframes fadeInOut {
+            from {
+              opacity: 0.4;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      ul {
+        padding: 0;
+      }
+    }
+  }
+
+  // users list styling
+  .users {
+    .heading {
+      padding: 1rem;
+    }
+
+    ul.sidenav__users {
+      padding: 0;
+      list-style: none;
+
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .sidenav__items {
+        border-bottom: 1px solid #1c1c1c;
+        padding: 1rem;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s ease-in-out;
+
+        &:hover {
+          background: #2d2c2c;
+        }
+
+        .sidenav__items__left {
+          display: flex;
+          flex: 0.7;
+          align-items: center;
+          justify-content: flex-start;
+
+          .username {
+            margin-left: 16px;
+            color: var(--font-light-100);
+          }
+        }
+      }
+    }
+  }
+
+  //   @media query
+  @media screen and (max-width: 600px) {
+    width: 20rem;
+  }
+
+  @media screen and (max-width: 400px) {
+    width: 100%;
+  }
+}
