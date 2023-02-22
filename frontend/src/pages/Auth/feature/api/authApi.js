@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import {Axios as axios} from "../../../../config/axiosConfig";
 import { URL } from "../../../../helper/url";
 import { showNotification } from "../../../../helper/notification";
 import { getCredentials } from "../../../../utils/getCredential";

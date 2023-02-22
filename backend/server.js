@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 
 // cross origin resourse midilware
-app.use(cors({origin: 'https://chitchat-frontend-l8g9.onrender.com'}));
+app.use(cors({origin: process.env.CLIENT_URL || 'http://localhost:3000'}));
 
 // passportjs config
 require('./config/passport-local')(passport);

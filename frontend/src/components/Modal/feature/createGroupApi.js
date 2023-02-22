@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { URL } from "../../../helper/url";
-import axios from "axios";
+import { Axios as axios } from "../../../config/axiosConfig";
 
 export const getGroups = createAsyncThunk("chat/groups", async (thunkAPI) => {
   try {

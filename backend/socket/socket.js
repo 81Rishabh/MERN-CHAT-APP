@@ -4,6 +4,7 @@ module.exports.chat_sockets = function (chatServer) {
   const io = new Server(chatServer, {
     cors: {
       origin: "https://chitchat-frontend-l8g9.onrender.com",
+      // origin : "http://localhost:3000"
     },
   });
 

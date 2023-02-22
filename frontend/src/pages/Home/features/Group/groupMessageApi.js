@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import {Axios as axios} from "../../../../config/axiosConfig";
 import { URL } from "../../../../helper/url";
 
 export const sendGroupMessage = createAsyncThunk(

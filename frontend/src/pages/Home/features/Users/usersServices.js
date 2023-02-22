@@ -1,4 +1,5 @@
-import axios from "axios";
+
+import { Axios as axios } from "../../../../config/axiosConfig";
 import { URL } from "../../../../helper/url";
 
 const getUsers = async () => {
