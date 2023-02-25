@@ -1,0 +1,26 @@
+.loading-container {
+    overflow-x: hidden;
+    
+     .loader {
+         content : "";
+         background: rgb(210, 210, 210);
+         width : 25%;
+         position: absolute;
+         left: -40%;
+         height: 4px;
+         animation: loader 1s cubic-bezier(0.12, 0.63, 0.89, 0.4) infinite;
+     } 
+
+     @keyframes loader {
+        0% {
+          left: -40%;
+        }
+        50% {
+          left : 45%;
+          width: 75%;
+        }
+        100% {
+          left: 100%;
+        }
+     }
+  }

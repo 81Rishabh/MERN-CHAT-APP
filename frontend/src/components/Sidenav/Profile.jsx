@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { profile_upload } from "../../pages/Auth/feature/api/authApi";
-import { useNavigate } from "react-router-dom";
 import Avatar from "../Avatar/Avatar";
 
 function Profile({ open }) {
   const { user, loading } = useSelector((state) => state.auth);
   const [file, setfile] = useState(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   //  handle form submission
   const handleSubmit = (e) => {
@@ -28,7 +26,7 @@ function Profile({ open }) {
   const Logout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
-    navigate("/SignIn");
+    window.location.reload();
   };
 
   return (

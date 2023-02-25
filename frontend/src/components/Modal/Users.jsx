@@ -8,14 +8,11 @@ function Users(props) {
   const handleSelectUser = (event , USER_ID) => {
       const isChecked = event.target.checked;
       props.setusers(prev => {
-         if(isChecked) {
-            prev = [...prev , USER_ID];
-         } else {
-            prev = prev.filter(user => user !== USER_ID);
-         }
-         return prev;
-      })
+          return isChecked ? [...prev , USER_ID] : prev.filter(user => user !== USER_ID);
+      });
   }
+
+  
 
   return (
     <div

@@ -7,8 +7,16 @@ module.exports.chat_sockets = function (chatServer) {
       // origin : "http://localhost:3000"
     },
   });
-
+  
   io.on("connection", function (socket) {
+    console.log(socket.connected);
+    socket.on("connection init" , ({isConnected,user}) => {
+       if(isConnected && Object.keys(user).length !== 0) {
+         socket.join(user._id);
+         console.log(`${user.username} initial joined` + user._id);
+       }
+    });
+
     // groups events
     groups_events(socket);
 
@@ -16,7 +24,8 @@ module.exports.chat_sockets = function (chatServer) {
     one_to_one_events(socket);
 
     // diconnection acknowladge
-    socket.on("disconnect", function () {
+    socket.on("disconnect", function (reason) {
+     console.log(reason);
       console.log("socket disconnected!");
     });
   });
@@ -25,16 +34,24 @@ module.exports.chat_sockets = function (chatServer) {
 // groups events
 function groups_events(socket) {
   // user connected
-  socket.on("setup", ({ user, groupId }) => {
-    socket.join(groupId);
+  socket.on("setup", ({ user, group }) => {
+    socket.join(group._id);
+    console.log(`${user.username} is connected with ${group.groupName}` + user._id);
   });
 
   // listening group_message event
+  // boradcast message all the associated groups
   socket.on("group_message", (userData) => {
-    // boradcast message all the associated groups
     socket.to(userData.groupId).emit("message", userData);
   });
 
+ // broadcast message to all client is conected in group
+ socket.on("group connection" , (data) => {
+   const {user , admin} = data;
+    socket.to(user).to(admin._id).emit("group connection", data)
+ });
+ 
+ 
   // handle typing
   socket.on("group-typing", (indicator) => {
     socket.to(indicator.groupId).emit("group typing", indicator);
@@ -45,8 +62,12 @@ function groups_events(socket) {
 function one_to_one_events(socket) {
   // user connection
   socket.on("one-to-one-connection", (userData) => {
-    socket.join(userData._id);
-    console.log(`${userData.username} is joined...`);
+     if(Object.keys(userData).length === 0) {
+      console.log(`${userData.username} is trying to join` + userData._id);
+     } else {
+        socket.join(userData._id);
+       console.log(`${userData.username} is joined in private room` + userData._id);
+     }
   });
 
   // private message

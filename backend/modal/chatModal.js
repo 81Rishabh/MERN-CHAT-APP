@@ -10,6 +10,10 @@ const groupchatSchema = mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',
     }],
+    profile_img : {
+        type : String,
+        default : 'https://icon-library.com/images/people-group-icon/people-group-icon-10.jpg'
+    },
     groupAdmin : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',

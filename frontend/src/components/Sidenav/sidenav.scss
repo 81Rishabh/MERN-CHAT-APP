@@ -11,8 +11,8 @@ div.sidenav {
   position: fixed;
   left: 0;
   top: 0;
-  transition: all.3s ease-out;
-  z-index: 2;
+  // transition: all .1s ease-out;
+  z-index: 4;
 
   header.sidenav__header {
     padding: 1rem;
@@ -145,11 +145,11 @@ div.sidenav {
   }
 
   //   @media query
-  @media screen and (max-width: 600px) {
-    width: 20rem;
-  }
+  // @media screen and (max-width: 600px) {
+  //   width: 20rem;
+  // }
 
-  @media screen and (max-width: 400px) {
+  @media screen and (max-width: 600px) {
     width: 100%;
   }
 }

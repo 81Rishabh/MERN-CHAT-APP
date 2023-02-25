@@ -1,8 +1,8 @@
-import React, { useEffect, useState, createRef } from "react";
+import React, { useEffect, useState, createRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { socket } from "../../socket";
 import { getFormateTime } from "../../utils/getFormateTime";
-import { saveGroupMessage } from "../../components/Modal/feature/groupSlice";
+import { saveGroupMessage } from "../../components/Feature/groupSlice";
 import { createMessage } from "./features/OneToOne/messageApi";
 import { sendGroupMessage } from "./features/Group/groupMessageApi";
 import {
@@ -10,153 +10,77 @@ import {
   saveReceivedMessage,
 } from "./features/Users/usersSlice";
 import Avatar from "../../components/Avatar/Avatar";
-import "./home.scss"; 
+import "./home.scss";
 import { useOutletContext } from "react-router-dom";
 
 function ChatContainer() {
   const dispatch = useDispatch();
   const [message, setMsg] = useState("");
-  const [isTyping , setisTyping] = useState(false);
   const { currentGroupDetils, isUpdated } = useSelector((state) => state.group);
-  const { user, isSelected } = useSelector((state) => state.User);
+  const { user, isSelected, loading } = useSelector((state) => state.User);
+  const [setClose, isTyping , setisTyping , typingUserId ,  ] = useOutletContext();
   const auth = useSelector((state) => state.auth);
   const messageContainerRef = createRef();
-  const loggedInUser = auth.user;
-  const [setClose] = useOutletContext();
+  const loggedInUser = auth && auth.user;
+
+  
+
+  // handle private message
+  const handlePrivateMessage = useCallback(
+    (newMessage) => {
+      dispatch(saveReceivedMessage({ ...newMessage, fromSelf: false }));
+      const typing = document.querySelector(
+        `#user-${newMessage.from}`
+      ).firstChild;
+      typing.removeChild(typing.lastChild);
+      setisTyping(false);
+    },
+    [dispatch,setisTyping]
+  );
+
+  // handle group message
+  const handleGroupMessage = useCallback(
+    (userData) => {
+      dispatch(saveGroupMessage({ ...userData, fromSelf: false }));
+      const currentGroup = document.getElementById(userData.groupId).lastChild;
+      currentGroup.textContent = "";
+    },
+    [dispatch]
+  );
 
 
 
   // socket connection
   useEffect(() => {
     setMsg("");
-    // -------------------hanlde groups convertation--------------
-    // connect to scoket instance
-    // group events
-    function groups_events() {
+    
       if (
         Object.keys(loggedInUser).length !== 0 &&
         currentGroupDetils !== null
       ) {
         socket.emit("setup", {
           user: loggedInUser,
-          groupId: currentGroupDetils._id,
+          group: currentGroupDetils,
         });
       }
-
-      // listing messag event from server
-      socket.on("message", (userData) => {
-        dispatch(saveGroupMessage({ ...userData, fromSelf: false }));
-        const currentGroup = document.getElementById(
-          userData.groupId
-        ).lastChild;
-        currentGroup.textContent = "";
-      });
-
-      // handling typing indicator
-      socket.on("group typing", (typing) => {
-        const { groupId, message, value } = typing;
-        const currentGroup = document.getElementById(groupId).lastChild;
-        if (message.length === 0) {
-          currentGroup.textContent = "";
-          // setTyping(false);
-        } else {
-          currentGroup.textContent = value;
-          // setTyping(true);
-        }
-      });
-    }
-
-    // invoke functions
-    groups_events();
-
-    // ------------------hanlding one to one communication-------------
-    // one to one events
-    function one_to_one_events() {
-      // user connection
-      if (loggedInUser !== null) {
-        socket.emit("one-to-one-connection", loggedInUser);
-      }
-
-      // private message
-      socket.on("private-message", (newMessage) => {
-        // save message an auxilary space
-        dispatch(saveReceivedMessage({ ...newMessage, fromSelf: false }));
-        setisTyping(false);
-        
-      });
-
-      // handling typing event
-      socket.on("individual typing", (typing) => {
-        if (typing.message.length === 0) {
-          setisTyping(false);
-        } else {
-          setisTyping(true);
-        }
-      });
-    }
-
-    // invoke functions
-    one_to_one_events();
-
+    
+    socket.on("message", handleGroupMessage);
+    socket.on("private-message", handlePrivateMessage);
 
     // useEffect cleanup
     return () => {
-      socket.off("connect");
-      socket.off("message");
-      socket.off("group typing");
-      socket.off("individual typing");
-      socket.off("private-message");
+      socket.off("message", handleGroupMessage);
+      socket.off("private-message", handlePrivateMessage);
     };
-  }, [loggedInUser, currentGroupDetils, dispatch, user]);
+  }, [
+    loggedInUser,
+    currentGroupDetils,
+    user,
+    handleGroupMessage,
+    handlePrivateMessage,
+  ]);
 
-  // render user defail if we have an user Details
-  const renderInfo = () => {
-    if (user !== null) {
-      return (
-        <div className="flex items-center pt-2">
-          <svg className="mr-2 md:hidden" width="25" height="25" fill="#9f9d9d" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" onClick={() => setClose(false)}>
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z"></path>
-         </svg>
-          <Avatar w="40" h="40" imgURL={user.profile_img} />
-          <div className="ml-3">
-            <p className="text-white font-semibold">{user.username}</p>
-            <p className="text-zinc-400 font-light text-xs mt-1">online</p>
-          </div>
-        </div>
-      );
-    }
-
-    // render user defail if we have an group Details
-    if (currentGroupDetils !== null) {
-      return (
-        <div className="header__info">
-          <div
-            className="title"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: ".5rem 0",
-            }}
-          >
-            <Avatar w="25" h="25" imgURL={null} />
-            <span style={{ marginLeft: "10px" }}>
-              {currentGroupDetils.groupName}
-            </span>
-          </div>
-          <p className="sub__title">
-            <span>You,</span>
-            {currentGroupDetils.users.map((user) => (
-              <span key={user._id}>
-                {user.username}
-                {","}
-              </span>
-            ))}
-          </p>
-        </div>
-      );
-    }
-  };
-
+  
   useEffect(() => {
     const chatMessages = messageContainerRef.current;
     // chatMessages.scrollTop =
@@ -164,8 +88,14 @@ function ChatContainer() {
       top: chatMessages.scrollHeight,
       behavior: "smooth",
     });
-
-  }, [isUpdated, isSelected, user, isTyping ,currentGroupDetils,messageContainerRef]);
+  }, [
+    isUpdated,
+    isSelected,
+    user,
+    isTyping,
+    currentGroupDetils,
+    messageContainerRef,
+  ]);
 
   // handling message sending inside perticular group
   function sendMessage(e) {
@@ -178,28 +108,22 @@ function ChatContainer() {
         content: message,
         time: getFormateTime(),
       };
-
       // send private message
       socket.emit("privateMessage", data);
-
       // save message in db
       dispatch(createMessage(data));
-
       // set  my message
       const newMessage = { ...data, fromSelf: true };
-
       // save message an auxilary space
       dispatch(saveSendMessage(newMessage));
-
       // stop typing
       setisTyping(false);
-
+      
     } else if (message !== "" && currentGroupDetils !== null) {
-
       let data = {
-        sender : {
-            _id : auth.user._id,
-            username : auth.user.username,
+        sender: {
+          _id: auth.user._id,
+          username: auth.user.username,
         },
         content: message,
         groupId: currentGroupDetils._id,
@@ -216,12 +140,14 @@ function ChatContainer() {
       dispatch(saveGroupMessage(userData));
 
       // svae message in DB
-      dispatch(sendGroupMessage({
-        sender : auth.user._id,
-        content : message,
-        time : getFormateTime(),
-        group : currentGroupDetils._id
-      }))
+      dispatch(
+        sendGroupMessage({
+          sender: auth.user._id,
+          content: message,
+          time: getFormateTime(),
+          group: currentGroupDetils._id,
+        })
+      );
     }
 
     // clear input
@@ -237,7 +163,6 @@ function ChatContainer() {
         groupId: currentGroupDetils._id,
         message: e.target.value,
       });
-
     } else if (user !== null) {
       socket.emit("individual-typing", {
         to: user._id,
@@ -247,6 +172,71 @@ function ChatContainer() {
     }
   };
 
+  // render user defail if we have an user Details
+  const renderInfo = () => {
+    if (user) {
+      return (
+        <div className="flex items-center pt-2">
+          <svg
+            className="mr-2 md:hidden"
+            width="25"
+            height="25"
+            fill="#9f9d9d"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            onClick={() => setClose(false)}
+          >
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z"></path>
+          </svg>
+          <Avatar w="40" h="40" imgURL={user.profile_img} />
+          <div className="ml-3">
+            <p className="text-white font-semibold">{user.username}</p>
+            <p className="text-zinc-400 font-light text-xs mt-1">online</p>
+          </div>
+        </div>
+      );
+    } else {
+      <div className="">User loading...</div>;
+    }
+
+    // render user defail if we have an group Details
+    if (currentGroupDetils) {
+      return (
+        <div className="header__info flex items-center pt-2">
+            <svg
+            className="mr-2 md:hidden"
+            width="25"
+            height="25"
+            fill="#9f9d9d"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            onClick={() => setClose(false)}
+          >
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z"></path>
+          </svg>
+          <Avatar w="40" h="40" imgURL={currentGroupDetils.profile_img} />
+          <div className="ml-3">
+            <p className="text-white font-semibold">
+              {currentGroupDetils.groupName}
+            </p>
+            <p className="sub__title text-zinc-400 font-light text-xs mt-2">
+              <span>
+                You,{" "}
+                {currentGroupDetils.users.map((user) => (
+                  <span key={user._id}>
+                    {user.username}
+                    {","}
+                  </span>
+                ))}
+              </span>
+            </p>
+          </div>
+        </div>
+      );
+    }
+  };
+
+
   // render group messages
   const renderGroupMessages = (messages) => {
     return (
@@ -254,34 +244,28 @@ function ChatContainer() {
       messages.map((msg, idx) => {
         if (msg.sender._id === loggedInUser._id) {
           return (
-            <div className="my-message" key={idx}>
-              <div className="message-wrapper right">
-                <div
-                  className="message-username"
-                  style={{ background: "rgb(64 64 64)" }}
-                >
+            <div className="w-full" key={idx}>
+              <div className="bg-emerald-900 shadow-md rounded-md float-right clear-both my-2">
+                <div className="p-2 text-zinc-300 text-xs bg-emerald-800 rounded-tl-md rounded-tr-md">
                   {msg.sender.username}
                 </div>
-                <div className="message-body">
-                  <span>{msg.content}</span>{" "}
-                  <span className="message-time">{msg.time}</span>
+                <div className="message-body h-auto p-2">
+                  <span className="text-white">{msg.content}</span>{" "}
+                  <span className="text-[10px] mt-2 float-right ml-3 text-gray-400">{msg.time}</span>
                 </div>
               </div>
             </div>
           );
         } else {
           return (
-            <div className="recipient-message" key={idx}>
-              <div className="message-wrapper left">
-                <div
-                  className="message-username"
-                  style={{ background: "#333333" }}
-                >
-                {msg.sender.username}
+            <div className="w-full" key={idx}>
+              <div className="bg-zinc-800 shadow-md rounded-md float-left clear-both my-2">
+                <div className="p-2 text-zinc-300 text-xs bg-zinc-700 rounded-tl-md rounded-tr-md">
+                  {msg.sender.username}
                 </div>
-                <div className="message-body">
-                  <span>{msg.content}</span>{" "}
-                  <span className="message-time">{msg.time}</span>
+                <div className="message-body h-auto p-2">
+                  <span className="text-white">{msg.content}</span>{" "}
+                  <span className="text-[10px] mt-2 float-right ml-3 text-gray-400">{msg.time}</span>
                 </div>
               </div>
             </div>
@@ -293,28 +277,28 @@ function ChatContainer() {
 
   // render single message
   const renderIndividualMessages = (messages) => {
-    return (
-      messages &&
+    return loading ? (
+      <div className="loading-container flex-col  w-full h-full bg-zinc-800 opacity-80 flex justify-center items-center shadow-lg rounded-md">
+        <div className="circle w-16 h-16 border-4 border-white border-t-indigo-700 animate-spin rounded-full" />
+        <h4 className="text-zinc-400 mt-4">Loading Messages...</h4>
+      </div>
+    ) : (
       messages.map((msg, idx) => {
-        if (
-          msg.hasOwnProperty("fromSelf")
-            ? msg.fromSelf
-            : msg.from === loggedInUser._id
-        ) {
+        if (msg.hasOwnProperty("fromSelf") ? msg.fromSelf : msg.from === loggedInUser._id) {
           return (
             <div className="my-message" key={idx}>
-              <div className="message-wrapper right">
-                <span>{msg.content}</span>{" "}
-                <span className="message-time">{msg.time}</span>
+              <div className="message-wrapper right bg-emerald-800 shadow-md rounded-md">
+                <span >{msg.content}</span>{" "}
+                <span className="message-time text-[10px] mt-2 float-right ml-3 text-gray-400">{msg.time}</span>
               </div>
             </div>
           );
         } else {
           return (
             <div className="recipient-message" key={idx}>
-              <div className="message-wrapper left">
+              <div className="message-wrapper left bg-zinc-800 shadow-md rounded-md">
                 <span>{msg.content}</span>{" "}
-                <span className="message-time">{msg.time}</span>
+                 <span className="message-time text-[10px] mt-2 float-right ml-3 text-gray-400">{msg.time}</span>
               </div>
             </div>
           );
@@ -333,17 +317,18 @@ function ChatContainer() {
         {currentGroupDetils !== null
           ? renderGroupMessages(currentGroupDetils.messages)
           : user && renderIndividualMessages(user.message)}
-          {
-            isTyping && (
-              <div className="recipient-message animation-[translate] transition duration-300">
-              <div className="message-wrapper left typing-indicator" style={{minWidth : '100px'}}>
-                 <div className="circle"></div>
-                 <div className="circle"></div>
-                 <div className="circle"></div>
-              </div>
+        {isTyping && typingUserId === user?._id && (
+          <div className="recipient-message ">
+            <div
+              className="message-wrapper animate-[translate] transition duration-300  left bg-zinc-800 shadow-md rounded-md typing-indicator"
+              style={{ minWidth: "70px" }}
+            >
+              <div className="circle"></div>
+              <div className="circle"></div>
+              <div className="circle"></div>
             </div>
-            )
-          }
+          </div>
+        )}
       </div>
 
       {/* input box container */}

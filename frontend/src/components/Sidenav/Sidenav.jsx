@@ -8,9 +8,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAllUsers } from "../../pages/Home/features/Users/usersApi";
 import "./sidenav.scss";
 import Profile from "./Profile";
+import Notifications from "../Notifications/Notifications";
 
 function Sidenav(props) {
-  const {close , setClose} = props;
+  const { close, setClose } = props;
   const { data } = useSelector((state) => state.User);
   const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
@@ -21,27 +22,30 @@ function Sidenav(props) {
     dispatch(getAllUsers());
   }, [dispatch]);
 
-
   const handleSideNavbarTransform = () => {
-      const width = window.innerWidth;
-      if(width <= 400) {
-          setClose(true);
-      }
-  } 
+    const width = window.innerWidth;
+    if (width <= 600) {
+      setClose(true);
+    }
+  };
 
   useEffect(() => {
-    const handleResize = function(e) {
+    const handleResize = function (e) {
       const width = e.target.innerWidth;
-      if(width >= 400) {
-         setClose(false);
-      } 
-    }
-    window.addEventListener('resize' , handleResize);
-    return () => window.removeEventListener('resize' , handleResize);
-  },[setClose])
+      if (width >= 600) {
+        setClose(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setClose]);
 
   return (
-    <div className={`sidenav transition duration-75  ease-in-out ${close ? '-translate-x-96' : 'translate-x-0'}`}>
+    <div
+      className={`sidenav transition-all duration-50 ease-in-out ${
+        close ? "-translate-x-full" : "translate-x-0"
+      }`}
+    >
       {/* header */}
       <header className="sidenav__header">
         <div className="navbar-logo">
@@ -73,31 +77,26 @@ function Sidenav(props) {
             </svg>
             <span className="text-sm font-medium">New Group</span>
           </button>
-          <svg
-            width="23"
-            height="23"
-            fill="lightgrey"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M12 2.4a7.2 7.2 0 0 0-7.2 7.2v4.303l-.848.849A1.2 1.2 0 0 0 4.8 16.8h14.4a1.201 1.201 0 0 0 .848-2.048l-.848-.849V9.6A7.2 7.2 0 0 0 12 2.4Zm0 19.2A3.6 3.6 0 0 1 8.4 18h7.2a3.6 3.6 0 0 1-3.6 3.6Z"></path>
-          </svg>
+
+          {/* Notification */}
+
+          <Notifications />
 
           {/* prfile avatar */}
-           <div className="sidenav__profile__image relative">
-              <div onClick={() => setOpen(!open)}>
-                <Avatar w="35" h="35" imgURL={user.profile_img} />
-              </div>
+          <div className="sidenav__profile__image relative">
+            <div onClick={() => setOpen(!open)}>
+              <Avatar w="35" h="35" imgURL={user.profile_img} />
+            </div>
 
-              {/* prfile info */}
-              <Profile open={open}/>
-           </div>
+            {/* prfile info  */}
+            <Profile open={open} />
+          </div>
         </div>
       </header>
       <section className="sidenav__body">
-
+      
         {/* Accordion */}
-        <GroupAccordion />
+        <GroupAccordion handleSideNavbarTransform={handleSideNavbarTransform} />
 
         {/* Users */}
         <div className="users">
@@ -111,12 +110,17 @@ function Sidenav(props) {
               </span>
             </p>
           </div>
-          <ul className="sidenav__users divide-y divide-white">
-            {data.length > 0 ?
+          <ul className="sidenav__users">
+            {data.length > 0 ? (
               data.map((user) => {
                 return (
-                  <Link to={`chat?userId=${user._id}`} key={user._id} onClick={handleSideNavbarTransform}>
-                    <li className=" p-4 mx-3  hover:bg-zinc-800 hover:shadow-md rounded-md border border-transparent hover:border-gray-700 transition-all duration-200">
+                  <Link
+                    to={`chat?userId=${user._id}`}
+                    key={user._id}
+                    onClick={handleSideNavbarTransform}
+                    id={`user-${user._id}`}
+                  >
+                    <li className=" p-4 mx-3  hover:bg-zinc-800 hover:shadow-md rounded-md border border-transparent hover:border-zinc-700 transition-all duration-200">
                       <div className="flex items-center">
                         <Avatar w="30" h="30" imgURL={user.profile_img} />
                         <p className="username ml-3">{user.username}</p>
@@ -124,8 +128,12 @@ function Sidenav(props) {
                     </li>
                   </Link>
                 );
-              }) : <p className="text-zinc-600 text-center text-xs">There is other recipient users</p>
-            }
+              })
+            ) : (
+              <p className="text-zinc-600 text-center text-xs">
+                There is other recipient users
+              </p>
+            )}
           </ul>
         </div>
       </section>

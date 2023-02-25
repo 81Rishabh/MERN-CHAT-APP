@@ -2,25 +2,31 @@ import React, { useState, useEffect } from "react";
 import groupLogo from "../../assets/groupSm.png";
 import Avatar from "../Avatar/Avatar";
 import { useSelector, useDispatch } from "react-redux";
-import { getGroups } from "../Modal/feature/createGroupApi";
+import { getGroups, getGroupByUserId } from "../Feature/groupApi";
 import { Link } from "react-router-dom";
 
-function Accordion() {
+function Accordion({
+  handleSideNavbarTransform
+}) {
   const [show, setshow] = useState(false);
-  const { isCreated } = useSelector((state) => state.group);
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const groups = user && user.groups;
+  const {loading, isCreated, isNewGroupCreated, myGroups } = useSelector(
+    (state) => state.group
+  );
 
+
+
+  // fetch profile
   useEffect(() => {
-    if (isCreated) {
+    if (isCreated || isNewGroupCreated) {
       dispatch(getGroups());
+      dispatch(getGroupByUserId());
     }
-  }, [dispatch, isCreated]);
+  }, [dispatch, isCreated, isNewGroupCreated]);
 
   // accrodion style
   const accordionStyle = {
-    height: show ? "auto" : "0",
+    height: show ? "auto" : "0px",
     overflow: "hidden",
   };
 
@@ -63,20 +69,24 @@ function Accordion() {
       >
         <div className="groups">
           <ul className="sidenav__groups">
-            {groups === undefined || groups.length === 0 ? (
-              <li  className="text-zinc-600 text-xs text-center">
+            {loading ? (
+              <div
+                className={`circle w-6 h-6 border-4 border-zinc-600 border-t-gray-400 animate-spin rounded-full mx-auto`}
+              />
+            ) : myGroups === undefined || myGroups.length === 0 ? (
+              <li className="text-zinc-600 text-xs text-center">
                 No Group is Created
               </li>
             ) : (
-              groups.map((group) => {
+              myGroups.map((group) => {
                 return (
-                  <Link to={`chat?groupId=${group._id}`} key={group._id}>
+                  <Link to={`chat?groupId=${group._id}`} key={group._id} onClick={() => handleSideNavbarTransform()}>
                     <li
-                      className="sidenav__groups__items p-3 mx-2 hover:bg-zinc-800 hover:shadow-md border border-transparent hover:border-gray-700 transition-all duration-200 rounded-md"
+                      className="sidenav__groups__items p-3 mx-2 hover:bg-zinc-800 hover:shadow-md border border-transparent hover:border-zinc-700 transition-all duration-200 rounded-md"
                       id={group._id}
                     >
                       <div className="flex justify-start items-center">
-                        <Avatar w="20" h="20" imgURL={null} />
+                        <Avatar w="20" h="20" imgURL={group.profile_img} />
                         <p className="ml-3">{group.groupName}</p>
                       </div>
                       <p className="typing-text"></p>

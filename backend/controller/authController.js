@@ -9,7 +9,7 @@ module.exports.getProfile = async function (req, res, next) {
     const id = req.params.id;
     const user = await User.findById(id)
     .populate('groups')
-    .select('username email profile_img groups  message');
+    .select('username email profile_img groups message');
 
     return res.status(200).json({
        data : user

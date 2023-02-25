@@ -3,6 +3,25 @@ const UserModal = require("../modal/user");
 const groupMessageModal = require("../modal/GroupMessage");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+// controller for get own created groups messages
+
+module.exports.getMyGroups = async (req,res,next) => {
+   const userId = req.user.id;
+   try {
+      let groups = await chatModal.find({
+         groups : {
+           $in : [userId]
+         }
+      });
+      return res.status(200).json({
+          data : groups,
+          success : true
+      });
+   } catch (error) {
+    
+   }
+}
+
 // controller for get all the create groups
 module.exports.groups = async (req, res, next) => {
   try {

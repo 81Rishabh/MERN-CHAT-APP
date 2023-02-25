@@ -22,7 +22,12 @@ const authReducer = createSlice({
         state.isUploaded = false;
         state.error = null;
      },
-   
+
+     AddNewGroup : (state , action) => {
+        if(state.user) {
+          state.user.groups.push(action.payload);
+        }
+     }
   },
   extraReducers: (builder) => {
     // #################### SIGNIN #####################
@@ -99,4 +104,4 @@ const authReducer = createSlice({
 });
 
 export default authReducer.reducer;
-export const { reset } = authReducer.actions;
+export const { reset ,AddNewGroup } = authReducer.actions;

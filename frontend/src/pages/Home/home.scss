@@ -29,13 +29,13 @@
 
    
     .message-wrapper {
-      min-width: 125px;
+      min-width: 100px;
       max-width: auto;
-      padding: 0.75rem;
       margin: 10px;
+      padding: .5rem .5rem .5rem .75rem;
       font-size: 0.85rem;
       color: rgb(255, 255, 255);
-      height: 60px;
+      height: auto;
       
       .message-username {
         color: rgb(126, 159, 139);
@@ -56,11 +56,7 @@
         padding: 5px 0;
       }
       
-      .message-time {
-         font-size: 10px;
-         color: rgb(175, 175, 175);
-         margin-left: 10px;
-      }
+
     }
 
 
@@ -68,11 +64,6 @@
     .left {
       float: left;
       clear: right;
-      background-color: #292929;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      border: 1px solid rgba(68, 67, 67, 0.981);
       position: relative;
     }
 
@@ -80,38 +71,27 @@
       display: flex;
       align-items: center;
       justify-content: space-evenly;
-      width: 20px;
+      width: 15px;
 
       .circle {
-        width : 15px;
-        height: 15px;
+        width : 10px;
+        height: 10px;
         background-color:#4d4d4d;
         border-radius: 50px;
+        animation: typing .6s ease infinite alternate backwards;
        
 
-        &:nth-child(1) {
-          animation: typing 1.5s ease infinite;
-          
-        }
-
         &:nth-child(2) {
-          animation: typing 2s ease  infinite;
+          animation-delay: 1s;
         }
-
+        
         &:nth-child(3) {
-          animation: typing 2.5s ease  infinite;
+          animation-delay: 2s;
         }
 
         @keyframes typing {
-           0% {
-             transform: translate(0px);
-            }
-            50% {
-             transform: translateY(-5px);
-            }
-            100% {
-              transform: translateY(0px);
-           }
+           from {transform: translateY(-5px)}
+           to {transform: translateY(0px)}
         }
       }
     }
@@ -119,12 +99,7 @@
     .right {
       float: right;
       clear: left;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      border-bottom-left-radius: 10px;
-      border: 2px solid rgb(69, 69, 69);
       position: relative;
-      background: #303030;
     }
   }
 
@@ -231,10 +206,9 @@
 
   //  media Query for .chat-container
   @media screen and (max-width: 600px) {
-    margin-left: 20rem;
-  }
-
-  @media screen and (max-width: 400px) {
+    // margin-left: 20rem;
     margin-left: 0rem;
   }
+  
+
 }

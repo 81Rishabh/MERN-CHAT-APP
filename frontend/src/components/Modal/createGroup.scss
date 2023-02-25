@@ -8,8 +8,6 @@
  
 
 div.create__group__modal {
-  min-width: 20rem;
-  width: 40vw;
   height: auto;
   border-radius: 10px;
   background-color: #2d2d30;
@@ -17,7 +15,7 @@ div.create__group__modal {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 4;
+  z-index: 5;
   
  
   .modal__header {

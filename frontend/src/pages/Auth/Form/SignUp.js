@@ -4,6 +4,7 @@ import { useDispatch , useSelector } from "react-redux";
 import { signUp } from "../feature/api/authApi";
 import {reset} from '../feature/authSlice';
 import "../style/formStyle.scss";
+import Loading from "../../../components/Loading/Loading";
 
 
 function SignUp() {
@@ -11,7 +12,7 @@ function SignUp() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [conform_password, setconform_password] = useState("");
-  const { isRegistered} = useSelector((state) => state.auth);
+  const { isRegistered ,loading} = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -89,10 +90,11 @@ function SignUp() {
               />
               <br />
             </div>
-            <button type="submit" className="bg-indigo-500 w-full py-3 mt-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md shadow-md cursor-pointer hover:scale-95 transition duration-100" disabled={(!email && !password) ? true : false} style={{
+            <button type="submit" className="relative bg-indigo-500 w-full py-3 mt-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md shadow-md cursor-pointer hover:scale-95 transition duration-100" disabled={(!email && !password) ? true : false} style={{
               opacity: (!email && !password) ? '.6' : '1'
             }}>
-              continue with email
+              <span>continue with email</span>
+              {loading && <Loading />}
             </button>
           </form>
           <div className="footer text-center">

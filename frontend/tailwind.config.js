@@ -4,9 +4,18 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    
     extend: {
-       'spin': 'spin 1s ease-in-out infinite',
-       'translateFromY' : 'translateFromY 1s ease-in infinite'
+       keyframes : {
+          translate : {
+             'from' : {transform : 'translateY(-10px)'},
+             'to' : {transform : 'translateY(0px)'},
+          }
+       },
+       animation: {
+          spin: 'spin 1s linear infinite',
+         translate : 'translate .5s ease infinite'
+       }
     },
   },
   plugins: [],

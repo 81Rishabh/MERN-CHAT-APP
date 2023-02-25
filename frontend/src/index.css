@@ -47,13 +47,13 @@ body {
 
 body::after {
   content: "";
-  background-color: #000000f0;
+  background-color: #020202ee;
   width: 100%;
   height: 100%;
   position: fixed;
   top: 0;
   bottom: 0;
-  opacity: 0.9;
+  opacity: 0.95;
   z-index: -1;
 }
 
