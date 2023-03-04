@@ -4,7 +4,6 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    
     extend: {
        keyframes : {
           translate : {
@@ -13,8 +12,8 @@ module.exports = {
           }
        },
        animation: {
-          spin: 'spin 1s linear infinite',
-         translate : 'translate .5s ease infinite'
+          spin: 'spin .5s linear infinite',
+          translate : 'translate .5s ease infinite'
        }
     },
   },

@@ -1,3 +1,4 @@
+import React from 'react';
 
 function Avatar({w,h,imgURL}) {
   let originalUrl = imgURL;

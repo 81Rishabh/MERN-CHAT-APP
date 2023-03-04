@@ -1,6 +1,7 @@
 const ChatModal = require("../modal/SingleChatModal");
 const Users = require("../modal/user");
 const Messages = require("../modal/SingleChatModal");
+const { findOne } = require("../modal/user");
 
 // controller for fetching messages
 module.exports.fetchMessages = async (req, res, next) => {

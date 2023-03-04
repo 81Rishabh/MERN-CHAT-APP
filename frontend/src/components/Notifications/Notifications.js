@@ -57,10 +57,11 @@ function Notifications() {
         )
        }
       </div>
+     
       <div
         className={`${
           openNotification ? "opacity-100 z-50" : "opacity-0 -z-10"
-        } w-96 h-96  transition duration-50 ease-in overflow-hidden bg-zinc-800 absolute top-8 left-0 shadow-md rounded-md p-5`}
+        } w-96 h-96  transition duration-50 ease-in overflow-hidden bg-zinc-800 absolute md:top-8 right-0 md:left-0 shadow-md rounded-md p-5`}
       >
         <div>
           <h3 className="text-white font-semibold">Notification</h3>

@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "email is required"],
+      unique : true,
       match: [
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         "Please use a valid email address",
@@ -24,10 +25,17 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "password is required"],
+      minLength : [6 , "Password length should be at least six"]
     },
     conform_password: {
       type: String,
       required: [true, "conform_password is required"],
+      validate : {
+        validator : function (el) {
+          return el === this.password;
+        },
+        message : 'Password don\'t match.'
+      }
     },
     groups : [{
       type : mongoose.Schema.Types.ObjectId,
@@ -36,7 +44,12 @@ const userSchema = new mongoose.Schema(
     message : [{
       type : mongoose.Schema.Types.ObjectId,
       ref : 'SingleChat'
-    }]
+    }],
+    lastMessage : {
+      type : mongoose.Schema.Types.ObjectId, 
+      ref : 'SingleChat',
+      default : null
+    }
   },
   { timestamps: true }
 );

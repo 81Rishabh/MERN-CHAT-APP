@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState , useRef } from "react";
+import { NavLink } from "react-router-dom";
 import Logo from "../../assets/logo81.png";
 import Avatar from "../Avatar/Avatar";
 import UserLogo from "../../assets/user(1).png";
@@ -9,25 +9,41 @@ import { getAllUsers } from "../../pages/Home/features/Users/usersApi";
 import "./sidenav.scss";
 import Profile from "./Profile";
 import Notifications from "../Notifications/Notifications";
+import { newMessageViewed } from "../../pages/Home/features/Users/usersSlice";
+import { removeNavItemsActiveStyle } from "./util";
 
 function Sidenav(props) {
   const { close, setClose } = props;
-  const { data } = useSelector((state) => state.User);
-  const { user } = useSelector((state) => state.auth);
+  const { data, usersFetched } = useSelector((state) => state.User);
+  const auth = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
+  const navItemRef = useRef();
+  const groupItemsRef = useRef();
 
   // fetch all the user
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);
 
-  const handleSideNavbarTransform = () => {
+  const handleSideNavbarTransform = (userId) => {
     const width = window.innerWidth;
     if (width <= 600) {
       setClose(true);
     }
+    dispatch(newMessageViewed(userId));  
+    activeClassStyle(userId);
+    removeNavItemsActiveStyle(groupItemsRef);
   };
+
+  const activeClassStyle = (userId) => {
+    const navItems = navItemRef.current.children;
+    const current = document.getElementById(`user-${userId}`);
+    const itemsExceptCurrent = Array.from(navItems).filter(item => item !== current);
+    itemsExceptCurrent.forEach(item => item.classList.remove('active'));
+    current.classList.add('active');
+  }
+
 
   useEffect(() => {
     const handleResize = function (e) {
@@ -40,9 +56,11 @@ function Sidenav(props) {
     return () => window.removeEventListener("resize", handleResize);
   }, [setClose]);
 
+
+
   return (
     <div
-      className={`sidenav transition-all duration-50 ease-in-out ${
+      className={`sidenav bg-zinc-900 transition-all duration-50 ease-in-out ${
         close ? "-translate-x-full" : "translate-x-0"
       }`}
     >
@@ -79,27 +97,29 @@ function Sidenav(props) {
           </button>
 
           {/* Notification */}
-
-          <Notifications />
+           <Notifications />
 
           {/* prfile avatar */}
           <div className="sidenav__profile__image relative">
             <div onClick={() => setOpen(!open)}>
-              <Avatar w="35" h="35" imgURL={user.profile_img} />
+              <Avatar w="35" h="35" imgURL={auth.user.profile_img} />
             </div>
 
-            {/* prfile info  */}
+              {/* prfile info  */}
             <Profile open={open} />
           </div>
         </div>
       </header>
       <section className="sidenav__body">
-      
-        {/* Accordion */}
-        <GroupAccordion handleSideNavbarTransform={handleSideNavbarTransform} />
+          {/* Accordion */}
+        <GroupAccordion 
+           setClose={setClose}
+           groupItemsRef={groupItemsRef}
+            navItemRef={navItemRef}
+         />
 
-        {/* Users */}
-        <div className="users">
+           {/* Users */}
+        <div className="users overflow-hidden">
           <div className="heading">
             <p style={{ display: "flex", alignItems: "center" }}>
               <span>
@@ -110,23 +130,54 @@ function Sidenav(props) {
               </span>
             </p>
           </div>
-          <ul className="sidenav__users">
-            {data.length > 0 ? (
+          <ul className="sidenav__users" ref={navItemRef}>
+            {usersFetched ? (
+              <li className="mx-3">
+                {Array.from([1, 2, 3, 4, 5]).map((_,idx) => (
+                  <div
+                    className="h-16 w-full bg-zinc-800 rounded-md shadow-md mb-2 p-2 flex start"
+                    key={idx}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-zinc-900  animate-pulse"></div>
+                    <div className="flex-auto flex flex-col justify-evenly ml-3">
+                      <div className="w-1/2 h-3 rounded-md bg-zinc-900  animate-pulse"></div>
+                      <div className="w-1/4 h-3 rounded-md bg-zinc-900  animate-pulse"></div>
+                    </div>
+                  </div>
+                ))}
+              </li>
+            ) : data.length > 0 ? (
               data.map((user) => {
                 return (
-                  <Link
-                    to={`chat?userId=${user._id}`}
-                    key={user._id}
-                    onClick={handleSideNavbarTransform}
+                  <li
+                    className={`p-4 mx-2 my-2  hover:bg-zinc-800 hover:shadow-md rounded-md  hover:border-zinc-900 transition-all duration-100`}
                     id={`user-${user._id}`}
+                    key={user._id}
+                    onClick={() => handleSideNavbarTransform(user._id)}
                   >
-                    <li className=" p-4 mx-3  hover:bg-zinc-800 hover:shadow-md rounded-md border border-transparent hover:border-zinc-700 transition-all duration-200">
-                      <div className="flex items-center">
-                        <Avatar w="30" h="30" imgURL={user.profile_img} />
-                        <p className="username ml-3">{user.username}</p>
+                   <NavLink
+                    to={`chat?userId=${user._id}`}
+                   >
+                      <div className="left flex items-center justify-start">
+                        <Avatar w="40" h="40" imgURL={user.profile_img} />
+                        <div className="ml-4 flex-1">
+                          <p className="username">{user.username}</p>
+                          <p className={`text-sm  mt-1 ${
+                            (user.lastMessage !== null &&
+                            'isSelected' in user.lastMessage && 
+                             user['lastMessage']['isSelected'] === false) ? 'text-zinc-100' : 'text-zinc-500'
+                          }`}>
+                            {user.lastMessage && user.lastMessage.content}
+                          </p>
+                        </div>
+                        <div className="right justify-self-end self-start text-xs text-zinc-500 flex flex-col justify-between">
+                          <span>
+                            {user.lastMessage && user.lastMessage.time}
+                          </span>
+                        </div>
                       </div>
-                    </li>
-                  </Link>
+                    </NavLink>
+                  </li>
                 );
               })
             ) : (

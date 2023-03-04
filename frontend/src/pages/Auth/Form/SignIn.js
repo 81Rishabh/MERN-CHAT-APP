@@ -1,9 +1,13 @@
+import React from 'react';
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../feature/api/authApi";
 import { useDispatch, useSelector } from "react-redux";
-import "../style/formStyle.scss";
 import Loading from "../../../components/Loading/Loading";
+import { socket } from "../../../socket";
+import { getCredentials } from "../../../utils/getCredential";
+import "../style/formStyle.scss";
 
 function SignIn() {
   const [email, setemail] = useState("");
@@ -15,8 +19,9 @@ function SignIn() {
 
   // check user is logged in
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
+    let {token} = getCredentials();
+    if (isLoggedIn || token) {
+       navigate("/");
     }
 
   }, [isLoggedIn, navigate]);
@@ -25,9 +30,16 @@ function SignIn() {
   const SignInHandler = (e) => {
     e.preventDefault();
     if (email && password) {
+
+      // login action
       dispatch(login({ email, password }));
+
+      // clear input field
       setemail("");
       setpassword("");
+
+      // connnect  
+      socket.connect();
     }
   };
 

@@ -4,7 +4,7 @@ import { getCredentials } from "../../../../utils/getCredential";
 import { URL } from "../../../../helper/url";
 import { Axios as axios } from "../../../../config/axiosConfig";
 
-export const fetchMessage = createAsyncThunk(
+export const fetchMessageByUser = createAsyncThunk(
   'user/fetchMessages',
   async (senderID, {rejectWithValue}) => {
      const {token} = getCredentials();

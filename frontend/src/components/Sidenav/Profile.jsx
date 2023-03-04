@@ -33,7 +33,7 @@ function Profile({ open }) {
     <div
       className={`${
         !open ? "w-0 h-0 hidden" : "w-auto h-auto block p-5"
-      } transition-all duration-75 ease-in-out duration-200  overflow-hidden bg-zinc-800 absolute top-0 left-12 shadow-md rounded-md p-5`}
+      } transition-all duration-50 ease-in-out duration-200 w-min bg-zinc-800 absolute right-0 top-10 z-50 md:left-0 shadow-md rounded-md p-5`}
     >
       <h3 className="text-md  font-medium border-bottom divide-y  mb-2 divide-current text-gray-300">
         Profile

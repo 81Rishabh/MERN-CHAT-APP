@@ -1,8 +1,11 @@
+import React, {useRef } from 'react';
 import { useSelector } from "react-redux";
 import Avatar from "../Avatar/Avatar";
 
 function Users(props) {
   const { data } = useSelector((state) => state.User);
+  const panelRef = useRef();
+
 
   // handle select users
   const handleSelectUser = (event , USER_ID) => {
@@ -16,11 +19,12 @@ function Users(props) {
 
   return (
     <div
-      className="Users"
+      className="Users transition-all ease-in-out duration-300 relative"
       style={{
-        height: props.showUsers ? "200px" : "0px",
-        position: "relative",
+        maxHeight : props.showUsers ? `${panelRef.current !== null ? panelRef.current.scrollHeight : 100}px` : "0px",
+        overflow : 'hidden'
       }}
+      ref={panelRef}
     >
       <ul>
         {data &&

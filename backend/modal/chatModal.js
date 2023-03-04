@@ -22,7 +22,7 @@ const groupchatSchema = mongoose.Schema({
     messages : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'groupMessage'
-    }]
+    }],
 });
 
 const groupChatModal = mongoose.model('GroupChat' , groupchatSchema);

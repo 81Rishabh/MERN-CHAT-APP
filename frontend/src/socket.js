@@ -3,8 +3,9 @@ import {io} from 'socket.io-client';
 const ENDPOINT = 'https://chitchat-nio0.onrender.com';
 
 export const socket = io(ENDPOINT , {
-    reconnection : false,
+    autoConnect : false
 });
+
 
 socket.onAny((event, ...args) => {
   console.log(`got ${event}`);
@@ -18,6 +19,6 @@ const tryReconnect = () => {
         }
       });
     }, 2000);
-  }
+}
   
   socket.io.on("close", tryReconnect);  

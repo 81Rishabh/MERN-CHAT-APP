@@ -72,7 +72,7 @@ module.exports.sign_up = async function (req, res, next) {
       return next(new Error("password don't match"));
     }
 
-    let user = await User.create(req.body);
+    let user = await User.create({...req.body});
     bcrypt.hash(password, saltRounds, function (err, hash) {
       // Store hash in your password DB.
       if (err) {
@@ -86,9 +86,13 @@ module.exports.sign_up = async function (req, res, next) {
       success: true,
       message: "Success! You have registered",
     });
-  } catch (error) {
-    res.status(404);
-    return next(new Error(error.message))
+  } catch (err) {
+    let message;
+    if(err.name === 'ValidationError') {
+       message = Object.values(err.errors).map(val => val.message);
+    }
+    res.status(400);
+    return next(new Error(message));
   }
 };
 

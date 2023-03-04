@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import groupLogo from "../../assets/groupSm.png";
 import Avatar from "../Avatar/Avatar";
 import { useSelector, useDispatch } from "react-redux";
 import { getGroups, getGroupByUserId } from "../Feature/groupApi";
 import { Link } from "react-router-dom";
+import { removeNavItemsActiveStyle } from "./util";
 
-function Accordion({
-  handleSideNavbarTransform
-}) {
+function Accordion({ setClose, groupItemsRef, navItemRef }) {
   const [show, setshow] = useState(false);
   const dispatch = useDispatch();
-  const {loading, isCreated, isNewGroupCreated, myGroups } = useSelector(
+  const panelRef = useRef();
+  const { loading, isCreated, isNewGroupCreated, myGroups } = useSelector(
     (state) => state.group
   );
-
-
 
   // fetch profile
   useEffect(() => {
@@ -24,9 +22,28 @@ function Accordion({
     }
   }, [dispatch, isCreated, isNewGroupCreated]);
 
+  const handleSideNavbarTransform = (groupId) => {
+    const width = window.innerWidth;
+    if (width <= 600) {
+      setClose(true);
+    }
+    activeClassStyle(groupId);
+    removeNavItemsActiveStyle(navItemRef);
+  };
+
+  const activeClassStyle = (userId) => {
+    const groupItems = groupItemsRef.current.children;
+    const current = document.getElementById(`group-${userId}`);
+    const itemsExceptCurrent = Array.from(groupItems).filter(
+      (item) => item !== current
+    );
+    itemsExceptCurrent.forEach((item) => item.classList.remove("active"));
+    current.classList.add("active");
+  };
+
   // accrodion style
   const accordionStyle = {
-    height: show ? "auto" : "0px",
+    maxHeight: show ? `${panelRef.current.scrollHeight}px` : "0px",
     overflow: "hidden",
   };
 
@@ -64,34 +81,37 @@ function Accordion({
         </span>
       </div>
       <div
-        className="accordion__body transition-all ease-in-out duration-300"
+        className="accordion__body transition-all ease-in-out duration-300 border-b border-zinc-800 max-h-0 py-2"
         style={{ ...accordionStyle }}
+        ref={panelRef}
       >
         <div className="groups">
-          <ul className="sidenav__groups">
+          <ul className="sidenav__groups" ref={groupItemsRef}>
             {loading ? (
               <div
-                className={`circle w-6 h-6 border-4 border-zinc-600 border-t-gray-400 animate-spin rounded-full mx-auto`}
+                className={`circle w-6 h-6 border-4 border-zinc-600 border-t-gray-400 animate-spin rounded-full mx-auto my-2`}
               />
             ) : myGroups === undefined || myGroups.length === 0 ? (
-              <li className="text-zinc-600 text-xs text-center">
+              <li className="text-zinc-600 text-xs text-center my-2">
                 No Group is Created
               </li>
             ) : (
               myGroups.map((group) => {
                 return (
-                  <Link to={`chat?groupId=${group._id}`} key={group._id} onClick={() => handleSideNavbarTransform()}>
-                    <li
-                      className="sidenav__groups__items p-3 mx-2 hover:bg-zinc-800 hover:shadow-md border border-transparent hover:border-zinc-700 transition-all duration-200 rounded-md"
-                      id={group._id}
-                    >
+                  <li
+                    className="sidenav__groups__items p-3 mx-2 hover:bg-zinc-800 hover:shadow-md border border-transparent hover:border-zinc-00 transition-all duration-200 rounded-md"
+                    id={`group-${group._id}`}
+                    onClick={() => handleSideNavbarTransform(group._id)}
+                    key={group._id}
+                  >
+                    <Link to={`chat?groupId=${group._id}`}>
                       <div className="flex justify-start items-center">
                         <Avatar w="20" h="20" imgURL={group.profile_img} />
                         <p className="ml-3">{group.groupName}</p>
                       </div>
                       <p className="typing-text"></p>
-                    </li>
-                  </Link>
+                    </Link>
+                  </li>
                 );
               })
             )}

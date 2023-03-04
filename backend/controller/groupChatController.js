@@ -5,22 +5,33 @@ const ErrorResponse = require("../utils/ErrorResponse");
 
 // controller for get own created groups messages
 
-module.exports.getMyGroups = async (req,res,next) => {
-   const userId = req.user.id;
-   try {
-      let groups = await chatModal.find({
-         groups : {
-           $in : [userId]
-         }
+module.exports.getMyGroups = async (req, res, next) => {
+  const userId = req.user.id;
+  const selectKey = "username email";
+  try {
+    let groups = await chatModal
+      .find({
+        $or: [{ users: { $in: [userId] } }, { groupAdmin: userId }],
+      })
+      .populate("users", selectKey)
+      .populate("groupAdmin", selectKey)
+      .populate({
+        path: "messages",
+        populate: {
+          path: "sender",
+          select: "_id username profile_img",
+        },
       });
-      return res.status(200).json({
-          data : groups,
-          success : true
-      });
-   } catch (error) {
-    
-   }
-}
+
+    return res.status(200).json({
+      data: groups,
+      success: true,
+    });
+  } catch (error) {
+    res.sendStatus(400);
+    return next(new Error(error.message));
+  }
+};
 
 // controller for get all the create groups
 module.exports.groups = async (req, res, next) => {

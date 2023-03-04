@@ -5,13 +5,11 @@
 }
 
 div.sidenav {
-  background: #1d1d1d;
   height: 100%;
   width: 25rem;
   position: fixed;
   left: 0;
   top: 0;
-  // transition: all .1s ease-out;
   z-index: 4;
 
   header.sidenav__header {
@@ -46,7 +44,6 @@ div.sidenav {
           background-color: #333232;
         }
       }
-
       svg {
         cursor: pointer;
       }
@@ -59,7 +56,6 @@ div.sidenav {
 
   // accordion styling
   .accordion {
-    // background: #2d2c2c;
     cursor: pointer;
     margin-bottom: 10px;
 
@@ -71,9 +67,6 @@ div.sidenav {
     }
 
     .accordion__body {
-      background: #1d1d1d;
-      overflow-y: auto;
-
       a {
         text-decoration: none;
         color: #fff;
@@ -144,12 +137,15 @@ div.sidenav {
     }
   }
 
-  //   @media query
-  // @media screen and (max-width: 600px) {
-  //   width: 20rem;
-  // }
-
   @media screen and (max-width: 600px) {
     width: 100%;
   }
 }
+
+
+// active class
+.active {
+   background: #27272a;
+   position: relative;
+}
+

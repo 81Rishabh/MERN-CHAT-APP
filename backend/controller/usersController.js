@@ -6,6 +6,7 @@ module.exports.users = async (req, res, next) => {
     .select('username profile_img groups message email')
     .populate('groups' , 'groupName groupAdmin')
     .populate('message')
+    .populate('lastMessage' , 'content time from')
 
     return res.status(200).json({
       users: users,

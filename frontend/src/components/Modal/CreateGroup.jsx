@@ -66,8 +66,10 @@ function CreateGroup(props) {
 
   // handle modal close
   function close() {
-    props.setOpen(false);
-    setshowUsers(false);
+      props.setOpen(false);
+      setshowUsers(false);
+      setgroupName("");
+      setusers([]);
   }
 
   return (
@@ -105,20 +107,24 @@ function CreateGroup(props) {
           <form className="modal__form" onSubmit={handleCreateGroupform}>
             <div className="form__group">
               <label>Group Name</label>
+              <div>
               <input
-                type="text"
-                placeholder="Enter Group Name"
-                value={groupName}
-                onChange={(e) => setgroupName(e.target.value)}
+                 type="text"
+                 placeholder="Enter Group Name"
+                 value={groupName}
+                 onChange={(e) => setgroupName(e.target.value)}
+                 className="w-full py-3 placeholder:text-xs text-gray-200 text-sm placeholder:font-medium placeholder:text-zinc-600 px-2 text-zinc-700 border-transparent rounded-md mt-1 bg-zinc-800 focus:outline focus:outline-zinc-600 transition-all duration-100 shadow-md"
               />
+              </div>
             </div>
             <div className="form__group rounded-md">
               <label>Search Users</label>
-              <div className="form__control">
+              <div className="form__control bg-zinc-800 rounded-md">
                 <input
                   type="text"
                   placeholder="Search Users.."
                   // onChange={hanldeSearchUsers}
+                  className="w-full py-3 placeholder:text-xs text-gray-200 text-sm placeholder:font-medium placeholder:text-zinc-600 px-2 text-zinc-700 border-transparent rounded-md mt-1 bg-transparent outline-none transition-all duration-100 shadow-md"
                   onFocusCapture={handleFocus}
                 />
                 <svg

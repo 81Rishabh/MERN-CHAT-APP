@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getGroupByUserId, getGroups, saveGroupInDB } from "./groupApi";
+import { getGroupByUserId, saveGroupInDB } from "./groupApi";
 
 let initialState = {
   loading: false,
@@ -22,14 +22,14 @@ const groupSlice = createSlice({
       state.error = null;
     },
     getGroupById: (state, action) => {
-      const { groups, groupId } = action.payload;
-      state.currentGroupDetils = groups.find((group) => group._id === groupId);
+      const { groupId } = action.payload;
+      state.currentGroupDetils =  state.myGroups.find((group) => group._id === groupId);
     },
     saveGroupInMemory: (state, action) => {
       state.groups.push(action.payload);
     },
     saveGroupMessage: (state, action) => {
-      const groups = state.groups;
+      const groups = state.myGroups;
       groups.forEach((group) => {
         if (group._id === action.payload.groupId) {
           // group.mess
@@ -48,20 +48,20 @@ const groupSlice = createSlice({
   },
   extraReducers: (builder) => {
     // fetch groups
-    builder
-      .addCase(getGroups.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(getGroups.fulfilled, (state, action) => {
-        state.loading = false;
-        state.groups = action.payload;
-        state.isNetworkError = false;
-      })
-      .addCase(getGroups.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.isNetworkError = true;
-      });
+    // builder
+    //   .addCase(getGroups.pending, (state) => {
+    //     state.loading = true;
+    //   })
+    //   .addCase(getGroups.fulfilled, (state, action) => {
+    //     state.loading = false;
+    //     state.groups = action.payload;
+    //     state.isNetworkError = false;
+    //   })
+    //   .addCase(getGroups.rejected, (state, action) => {
+    //     state.loading = false;
+    //     state.error = action.payload;
+    //     state.isNetworkError = true;
+    //   });
 
     // fetch group for individal user
 

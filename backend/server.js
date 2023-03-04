@@ -18,7 +18,6 @@ const connectDB = require('./db');
 connectDB();
 
 
-
 // logger middileware
 app.use(morgan('tiny'));
 

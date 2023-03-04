@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchMessage, getAllUsers } from "./usersApi";
+import { fetchMessageByUser as fetchMessage, getAllUsers } from "./usersApi";
 
 // initilState
 const initialState = {
   data: [],
+  usersFetched : false,
   loading: false,
   user: null,
   isSelected: false,
@@ -19,7 +20,8 @@ const usersSlice = createSlice({
     },
     currentUser: (state, action) => {
       const { data, userId } = action.payload;
-      state.user = getCurrentUser(data, userId);
+      let currentUser = getCurrentUser(data, userId);
+      state.user = currentUser;
       state.isSelected = true;
     },
     saveSendMessage: (state, action) => {
@@ -30,21 +32,46 @@ const usersSlice = createSlice({
       const ID = action.payload.from;
       saveMessage(state.data, ID, action);
     },
+    saveSentLastMessage : (state, action) => {
+       let user = state.data.find(user => user._id === action.payload.to);
+       user.lastMessage = action.payload;
+    },
+    saveReceivedLastMessage : (state, action) => {
+      let user = state.data.find(user => user._id === action.payload.from);
+      user.lastMessage = {
+        ...action.payload,
+        isSelected : state.user._id === user._id ? true : false,
+      }
+    },
+    newMessageViewed : (state ,action) => {
+      if(state.data.length > 0) {
+        let user = state.data.find(user => user._id === action.payload);
+        if(user.lastMessage !== null && user.lastMessage.hasOwnProperty('isSelected')) {
+          user.lastMessage['isSelected'] = true; 
+        }
+      }
+    },
+    setUserStatus : (state,action) => {
+       if(state.data.length > 0) {
+          let user = state.data.find(user => user._id === action.payload.id);
+          user['isOnline'] = action.payload.online; 
+       }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getAllUsers.pending, (state) => {
-        state.loading = true;
+        state.usersFetched = true;
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         const { users } = action.payload;
         const loggedInUser = localStorage.getItem("userId");
         const user = users.filter((user) => user._id !== loggedInUser);
-        state.loading = false;
+        state.usersFetched = false;
         state.data = [...user];
       })
       .addCase(getAllUsers.rejected, (state) => {
-        state.loading = false;
+        state.usersFetched = false;
         state.data = [];
       });
 
@@ -53,11 +80,14 @@ const usersSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchMessage.fulfilled, (state, action) => {
+        let user;
+        const {userId,data} = action.payload;
+        user = state.data.find((user) => user._id === userId);
+        // save message
+        user.message = [...data];
+        // last message
+        user.lastMessage = data.length > 0 ? data.at(-1) : null;
         state.loading = false;
-        let user = state.data.find(
-          (user) => user._id === action.payload.userId
-        );
-        user.message = [...action.payload.data];
       })
       .addCase(fetchMessage.rejected, (state, action) => {
         state.loading = false;
@@ -74,6 +104,8 @@ const saveMessage = function (users, userId, action) {
   });
 };
 
+
+
 const getCurrentUser = function (data, id) {
   if (data.length > 0) {
     return data.find((user) => user._id === id);
@@ -86,4 +118,8 @@ export const {
   resetUsersState,
   saveSendMessage,
   saveReceivedMessage,
+  saveSentLastMessage,
+  saveReceivedLastMessage,
+  newMessageViewed,
+  setUserStatus
 } = usersSlice.actions;

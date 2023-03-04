@@ -8,6 +8,6 @@ const passport = require('passport');
 router.get('/messages/:id', passport.authenticate('jwt' , {session : true}) , chatController.fetchMessages);
 
 // @port request for creating message
-router.post('/create_single_chat' , chatController.createSingleMessage)
+router.post('/create_single_chat', chatController.createSingleMessage)
 
 module.exports = router;
