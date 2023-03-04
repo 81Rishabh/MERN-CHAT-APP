@@ -60,6 +60,8 @@ function SignIn() {
                 type="text"
                 placeholder="Enter your email address"
                 value={email}
+                name="email"
+                id="email"
                 required={true}
                 onChange={(e) => setemail(e.target.value)}
                 className="w-11/12 my-2 bg-gray-50 outline outline-offset-2 outline-2 outline-gray-300 p-2 rounded-md shadow-sm focus:outline-indigo-500 transition-all duration-200"
