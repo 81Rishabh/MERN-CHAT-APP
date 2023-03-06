@@ -101,7 +101,7 @@ function Home() {
 
            // session of persitent connection
         socket.on("socket-session", (sessionID) => {
-          socket.auth = { sessionID };
+        socket.auth = { sessionID };
           // store it in the localStorage
           localStorage.setItem("sessionID", sessionID);
         });
