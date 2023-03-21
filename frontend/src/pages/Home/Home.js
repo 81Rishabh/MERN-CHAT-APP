@@ -25,6 +25,7 @@ function Home() {
   const [close, setClose] = useState(false);
   const [isTyping, setisTyping] = useState(false);
   const [typingUserId, settypingUserId] = useState(null);
+  const [refresh , setRefresh] = useState(false);
   const dispatch = useDispatch();
   const loc = useLocation();
   const params = getQueryParams(loc);
@@ -34,15 +35,6 @@ function Home() {
   const userId = params.userId;
   const groupId = params.groupId;
 
-  // // reconnection
-  useEffect(() => {
-     
-    //  const sessionID = localStorage.getItem('sessionID');
-    //  if(sessionID) {
-    //    socket.auth = { sessionID };
-    //    socket.connect();
-    //  }
-  },[]);
 
   // handling typing events
   const handleTyping = useCallback(({ message, from }) => {
@@ -142,7 +134,7 @@ function Home() {
     if (userId) {
       dispatch(fetchMessage(userId));
     }
-  }, [dispatch, userId]);
+  }, [dispatch, userId,refresh]);
 
   // fetch group by curresponded id
   useEffect(() => {
@@ -179,22 +171,31 @@ function Home() {
   useEffect(() => {
     dispatch(getProfile());
   }, [dispatch, isUploaded]);
-
+  
+  // props
+  const SideNavProps = {
+    refresh,
+    setRefresh,
+    setOpen,
+    close,
+    setClose
+  }
+ 
+// outlet props
+ const outletProps = [
+  setClose,
+  isTyping,
+  setisTyping,
+  typingUserId,
+  settypingUserId,
+]
   return (
     <div className="home">
       {/* create group modal box */}
       <CreateGroup open={open} setOpen={setOpen} />
       <main>
-        <Sidenav setOpen={setOpen} close={close} setClose={setClose} />
-        <Outlet
-          context={[
-            setClose,
-            isTyping,
-            setisTyping,
-            typingUserId,
-            settypingUserId,
-          ]}
-        />
+        <Sidenav {...SideNavProps} />
+        <Outlet context={[...outletProps]} />
       </main>
     </div>
   );

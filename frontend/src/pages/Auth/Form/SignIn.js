@@ -1,11 +1,9 @@
 import React from 'react';
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../feature/api/authApi";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../../components/Loading/Loading";
-import { socket } from "../../../socket";
 import { getCredentials } from "../../../utils/getCredential";
 import "../style/formStyle.scss";
 
@@ -37,9 +35,6 @@ function SignIn() {
       // clear input field
       setemail("");
       setpassword("");
-
-      // connnect  
-      socket.connect();
     }
   };
 

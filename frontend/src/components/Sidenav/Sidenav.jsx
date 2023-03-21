@@ -13,11 +13,10 @@ import { newMessageViewed } from "../../pages/Home/features/Users/usersSlice";
 import { removeNavItemsActiveStyle } from "./util";
 
 function Sidenav(props) {
-  const { close, setClose } = props;
+  const { close, setClose,refresh , setRefresh } = props;
   const { data, usersFetched } = useSelector((state) => state.User);
   const auth = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
-  const [refresh , setRefresh] = useState(false);
   const dispatch = useDispatch();
   const navItemRef = useRef();
   const groupItemsRef = useRef();
